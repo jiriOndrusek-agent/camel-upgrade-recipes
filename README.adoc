@@ -83,9 +83,8 @@ This project is released as standard Apache Camel module.
         <!-- versions for latest recipes, has to be kept aligned to the latest camel release -->
         <camel-latest-version>4.20.0</camel-latest-version>
 
-        <!-- versions for camel-spring-boot -->
+        <!-- versions for camel-spring-boot (Spring Framework/Security/Batch versions are read from its spring-boot-dependencies) -->
         <spring-boot-version>3.5.10</spring-boot-version>
-        <springframework-version>6.2.15</springframework-version>
 
         <!-- Should be aligned to quarkus-updates - https://github.com/quarkusio/quarkus-updates/blob/main/pom.xml#L64 -->
         <rewrite-recipe-bom.version>3.24.0</rewrite-recipe-bom.version>

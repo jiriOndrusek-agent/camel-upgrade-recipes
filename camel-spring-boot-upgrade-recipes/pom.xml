@@ -33,14 +33,12 @@
 
     <properties>
         <!-- versions for camel-spring-boot latest, has to be kept aligned to the latest camel-spring-boot release -->
+        <!-- springframework-version, spring-security-version and spring-batch-version are read from its spring-boot-dependencies -->
         <spring-boot-version>4.1.2</spring-boot-version>
-        <springframework-version>7.0.10</springframework-version>
-        <spring-security-version>7.1.2</spring-security-version>
-        <spring-batch-version>6.0.6</spring-batch-version>
 
         <!-- Spring versions for CSB 4.18 LTS, has to be kept aligned to camel-spring-boot 4.18.x -->
+        <!-- springframework-4.18-lts-version is read from its spring-boot-dependencies -->
         <spring-boot-4.18-lts-version>3.5.16</spring-boot-4.18-lts-version>
-        <springframework-4.18-lts-version>6.2.19</springframework-4.18-lts-version>
     </properties>
 
     <dependencyManagement>
@@ -103,5 +101,76 @@
                 </includes>
             </resource>
         </resources>
+        <plugins>
+            <!-- Derive the Spring versions from the spring-boot-dependencies BOMs before the recipes are filtered -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-spring-boot-boms</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/spring-boot-boms</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-dependencies</artifactId>
+                                    <version>${spring-boot-version}</version>
+                                    <type>pom</type>
+                                    <destFileName>latest.pom</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-dependencies</artifactId>
+                                    <version>${spring-boot-4.18-lts-version}</version>
+                                    <type>pom</type>
+                                    <destFileName>4.18-lts.pom</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>read-spring-versions</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <xmlproperty file="${project.build.directory}/spring-boot-boms/latest.pom" prefix="latest" />
+                                <xmlproperty file="${project.build.directory}/spring-boot-boms/4.18-lts.pom" prefix="lts" />
+                                <fail message="Spring version properties not found in spring-boot-dependencies">
+                                    <condition>
+                                        <not>
+                                            <and>
+                                                <isset property="latest.project.properties.spring-framework.version" />
+                                                <isset property="latest.project.properties.spring-security.version" />
+                                                <isset property="latest.project.properties.spring-batch.version" />
+                                                <isset property="lts.project.properties.spring-framework.version" />
+                                            </and>
+                                        </not>
+                                    </condition>
+                                </fail>
+                                <property name="springframework-version" value="${latest.project.properties.spring-framework.version}" />
+                                <property name="spring-security-version" value="${latest.project.properties.spring-security.version}" />
+                                <property name="spring-batch-version" value="${latest.project.properties.spring-batch.version}" />
+                                <property name="springframework-4.18-lts-version" value="${lts.project.properties.spring-framework.version}" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
