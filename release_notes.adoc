@@ -4,7 +4,7 @@
 
 === Camel 4.22 LTS migration recipes
 
-New aggregates for the Camel 4.22 LTS line (https://github.com/apache/camel-upgrade-recipes/issues/129[#129]), following the 4.18 LTS ones: `Camel422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-upgrade-recipes`) and `CamelSpringBoot422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-spring-boot-upgrade-recipes`). They chain every version recipe up to `camel422`, then the 4.22.1 and 4.22.2 patch recipes, without the 4.23 changes, and set the Camel and Camel Spring Boot versions to 4.22.2 (the `camel4.22-lts-version` property). Camel Spring Boot 4.22.x is on the same Spring Boot 4.1.x line as the latest release, so the Spring Boot aggregate shares the Spring targets of `CamelSpringBootMigrationRecipe`; `CamelSpringBoot422LtsVersionTest` fails once the latest Spring Boot target leaves that line. `CamelUpdate422LtsTestSuite` runs the 4.0 to 4.22.2 tests against the core aggregate.
+New aggregates for the Camel 4.22 LTS line (https://github.com/apache/camel-upgrade-recipes/issues/129[#129]), following the 4.18 LTS ones: `Camel422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-upgrade-recipes`) and `CamelSpringBoot422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-spring-boot-upgrade-recipes`). They chain every version recipe up to `camel422`, then the 4.22.1, 4.22.2 and 4.22.3 patch recipes, without the 4.23 changes, and set the Camel and Camel Spring Boot versions to 4.22.3 (the `camel4.22-lts-version` property). Camel Spring Boot 4.22.x is on the same Spring Boot 4.1.x line as the latest release, so the Spring Boot aggregate shares the Spring targets of `CamelSpringBootMigrationRecipe`; `CamelSpringBoot422LtsVersionTest` fails once the latest Spring Boot target leaves that line. `CamelUpdate422LtsTestSuite` runs the 4.0 to 4.22.3 tests against the core aggregate.
 
 == 4.23.0
 
@@ -135,6 +135,31 @@ The following table lists migration topics and indicates the level of coverage (
 `CamelSpringBoot418LTSMigrationRecipe` now also sets the `camel-spring-boot-version`, `camel.springboot.version` and `camel-spring-boot.version` properties, as `CamelSpringBootMigrationRecipe` already did, so a property-managed `camel-spring-boot-dependencies` BOM is updated for the LTS line too when the repository publishes no `maven-metadata.xml`. `CamelSpringBootBomVersionTest` runs against the LTS recipe, whose target is a released version, and checks every aggregate for these entries, instead of expecting the Maven-parser warnings of an unresolvable SNAPSHOT.
 
 NOTE: At the time these recipes were written, Camel 4.23.0 had not yet been released to Maven Central. The tests that resolve a `4.23.0` artifact (the `camel-camunda`, `camel-camunda-starter` and `camel-ai-tool-starter` renames and every `UpgradeDependencyVersion` expectation) were run against the Apache staging repositories of the 4.23.0 vote, `orgapachecamel-2081` (Camel) and `orgapachecamel-2082` (Camel Spring Boot), and fail with a Maven-parser warning comment until the release reaches Central.
+
+== 4.22.3
+
+=== Summary
+
+Patch recipes for Camel 4.22.3 (`camel422_3.CamelMigrationRecipe`), chained by the 4.22 LTS aggregates and by the next minor recipe. Checked against the `camel-4.22.3` tag; the 4.22 guide on `main` lists more 4.22.3 items than the tag ships (for example the Undertow EE servlet change is not in 4.22.3).
+
+=== Migration coverage
+
+[%autowidth,stripes=hover]
+|===
+| Migration | Coverage | Comment
+
+| https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#camel-openstack---the-remaining-swift-header-constants-follow-the-camel-naming-convention[camel-openstack: remaining Swift header names]
+| ✅ Full
+| `camel422_3.upgradeOpenstackSwiftHeaders`: `X-Container-Meta-`, `X-Versions-Location`, `X-Container-Read`, `X-Container-Write` -> `CamelOpenstackSwift*` (`RenameHeaders`) and the Endpoint DSL `xContainer*()`/`xVersionsLocation()` -> `openstackSwift*()` (`ChangeMethodName`), gated on `camel-openstack`.
+
+| https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#camel-pubnub---the-producer-uses-its-configured-channel[camel-pubnub: `CamelPubNubOverrideChannel`]
+| ❌ None
+| `CamelPubNubChannel` must be renamed only where it is set for a producer; not covered yet.
+
+| https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#upgrading-from-4222-to-4223[Other 4.22.3 changes]
+| ❌ None
+| Behaviour or secure-default changes, see the guide. netty `NettyPayloadHelper.setIn/setOut`: the new overloads need the `NettyEndpoint`, manual.
+|===
 
 == 4.22.2
 

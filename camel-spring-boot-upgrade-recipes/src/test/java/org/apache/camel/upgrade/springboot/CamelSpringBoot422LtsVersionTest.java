@@ -37,7 +37,7 @@ import static org.openrewrite.maven.Assertions.pomXml;
  */
 class CamelSpringBoot422LtsVersionTest implements RewriteTest {
 
-    private static final String LTS_VERSION = "4.22.2";
+    private static final String LTS_VERSION = "4.22.3";
 
     /**
      * Spring Boot line of camel-spring-boot 4.22.x. The aggregate shares its Spring targets with

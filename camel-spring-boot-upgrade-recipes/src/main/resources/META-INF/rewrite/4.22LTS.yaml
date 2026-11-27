@@ -64,6 +64,7 @@ recipeList:
   - org.openrewrite.maven.ChangePropertyValue:
       key: camel.springboot.version
       newValue: @camel4.22-lts-version@
+  - org.apache.camel.upgrade.camel422_3.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422_2.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422_1.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422.CamelSpringBootMigrationRecipe
