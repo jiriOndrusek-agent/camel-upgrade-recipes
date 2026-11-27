@@ -29,4 +29,9 @@ public class CamelUpdateLatestVersionTest extends AbstractCamelUpdateVersionTest
         return CamelTestUtil.getCamelLatestVersion();
     }
 
+
+    @Override
+    protected String javaVersion() {
+        return "21";
+    }
 }

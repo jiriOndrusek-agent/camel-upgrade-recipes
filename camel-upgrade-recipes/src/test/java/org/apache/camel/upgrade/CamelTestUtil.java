@@ -69,7 +69,8 @@ public class CamelTestUtil {
         v4_22_1(4, 22, 1, true),
         v4_22_2(4, 22, 2, true),
         v4_22_3(4, 22, 3, true),
-        v4_23(4, 23, 0);
+        v4_23(4, 23, 0),
+        v4_24(4, 24, 0);
 
         private int major;
         private int minor;
@@ -220,7 +221,7 @@ public class CamelTestUtil {
                     <artifactId>test</artifactId>
                     <version>1.0.0</version>
                     <properties>                                                                                     \s
-                        <maven.compiler.release>17</maven.compiler.release>                                          \s
+                        <maven.compiler.release>21</maven.compiler.release>                                          \s
                     </properties>
                     <dependencies>
                         <dependency>
