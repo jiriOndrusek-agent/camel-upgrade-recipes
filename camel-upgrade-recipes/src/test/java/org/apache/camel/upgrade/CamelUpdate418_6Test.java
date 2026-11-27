@@ -17,7 +17,6 @@
 package org.apache.camel.upgrade;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -32,10 +31,7 @@ import static org.openrewrite.yaml.Assertions.yaml;
  * Tests for migrating from Camel 4.18.5 to 4.18.6: the remaining camel-openstack Swift header names (CAMEL-25895),
  * which also ship in 4.22.3 and 4.24.0. The Swift Endpoint DSL header builders are the same in 4.18.5 and 4.22, so
  * the 4.22 jars are on the parser classpath.
- * <p>
- * Skipped under the latest aggregate until the 4.24 recipe chains {@code camel422_3}, which references this recipe.
  */
-@DisabledIfSystemProperty(named = CamelTestUtil.PROPERTY_USE_RECIPE, matches = "org\\.apache\\.camel\\.upgrade\\.CamelMigrationRecipe")
 public class CamelUpdate418_6Test implements RewriteTest {
 
     @Override
