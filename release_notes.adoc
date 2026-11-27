@@ -2,6 +2,65 @@
 
 == 4.24.0
 
+=== Summary
+
+Recipes for Camel 4.24.0 (`camel424.CamelMigrationRecipe`, `camel424.CamelSpringBootMigrationRecipe`), described by the https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html[migration guide]. They chain the 4.22.3 patch recipes. The table lists the 10 most important items of the guide; the recipes are in `4.24.yaml` of both modules.
+
+=== Migration coverage
+
+The 10 most important items of the guide.
+
+[%autowidth,stripes=hover]
+|===
+| Migration | Coverage | Comment
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_java[Java 21 minimum]
+| ✅ Full
+| `UpgradeToJava21` / `JavaVersion21`, only in the latest aggregates; the LTS aggregates stay on Java 17.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_spring_boot_4_2[Spring Boot 4.2 / Spring Framework 7.1]
+| ❌ None
+| Not covered yet: the Spring Boot targets stay on 4.1.x until the 4.22 LTS Spring Boot aggregate has targets of its own.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_jackson_3[Jackson 3]
+| ⚠️ Partial
+| Only the MCP module: `mcp-json-jackson2` -> `mcp-json-jackson3`. Types and other artifacts are manual.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_vert_x_5[Vert.x 5]
+| ❌ None
+| Manual.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_camel_ognl_removed[camel-ognl removed]
+| ⚠️ Partial
+| Dependency and starter removed; ognl expressions are manual.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_camel_wasm_the_endpoint_runs_wasi_command_modules_breaking_change[camel-wasm runs WASI command modules]
+| ❌ None
+| Manual: the modules must be rebuilt.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_camel_core_tokenize_the_token_is_literal_text_unless_regex_is_true[Tokenize: the token is literal unless `regex=true`]
+| ❌ None
+| Manual: review the tokens that are regular expressions.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_camel_controlbus_the_language_command_is_off_by_default[controlbus `language` command off by default]
+| ❌ None
+| Manual: set `allowedLanguages` where needed.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_camel_ftp_camel_mina_sftp_camel_azure_files_camel_smb_a_readlock_the_component_does_not_implement_fails_the_consumer[Remote file components: unsupported `readLock` fails the consumer]
+| ⚠️ Partial
+| Removed Endpoint DSL `readLock*` calls dropped; unsupported `readLock` values are manual.
+
+| https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html#_kamelets_removed_kamelets[Removed Kamelets]
+| ❌ None
+| Manual.
+|===
+
+Also automated (see `4.24.yaml`): Undertow EE servlet, Bouncy Castle 1.87 LMS/XMSS classes, rocketmq headers, toon `lengthMarker`, semantic expert artifacts and audit `decision` calls, backlog tracer activity options, Kubernetes client exclusion, minio `getObjectRange`, as2 client/send `ediMessageContentType`, aws-bedrock non-streaming operations, huaweicloud-smn `MESSAGE_ID`, jacksonxml / jackson3xml `ENABLE_TYPE_CONVERTER`, `RouteDiagramRenderer` constructor, `plc4x:s7-light` -> `plc4x:s7`, alibaba-sls `alibabaSlsListLogStoreName()`, removed `camel-jbang-plugin-route-parser`, and the 4.22.3 openstack Swift headers. Everything else in the guide is manual.
+
+NOTE: Camel 4.24.0 is not released yet. The recipes were developed against 4.23.0. The tests that need 4.24.0 artifacts (the semantic artifacts and the latest version bumps) were not run.
+
+NOTE: Deferred until the 4.22 LTS aggregates (https://github.com/apache/camel-upgrade-recipes/pull/140[#140]) have Spring targets of their own: the Spring Boot 4.2 / Spring Framework 7.1 targets and the `spring-boot-starter-amqp` -> `spring-boot-starter-rabbitmq` swap for `camel-spring-rabbitmq-starter`. Until then the latest Spring Boot aggregate pairs Camel Spring Boot 4.24 with Spring Boot 4.1.x.
+
 === Camel 4.22 LTS migration recipes
 
 New aggregates for the Camel 4.22 LTS line (https://github.com/apache/camel-upgrade-recipes/issues/129[#129]), following the 4.18 LTS ones: `Camel422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-upgrade-recipes`) and `CamelSpringBoot422LTSMigrationRecipe` (`4.22LTS.yaml` in `camel-spring-boot-upgrade-recipes`). They chain every version recipe up to `camel422`, then the 4.22.1, 4.22.2 and 4.22.3 patch recipes, without the 4.23 changes, and set the Camel and Camel Spring Boot versions to 4.22.3 (the `camel4.22-lts-version` property). Camel Spring Boot 4.22.x is on the same Spring Boot 4.1.x line as the latest release, so the Spring Boot aggregate shares the Spring targets of `CamelSpringBootMigrationRecipe`; `CamelSpringBoot422LtsVersionTest` fails once the latest Spring Boot target leaves that line. `CamelUpdate422LtsTestSuite` runs the 4.0 to 4.22.3 tests against the core aggregate.

@@ -1,0 +1,662 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#####
+# Rules coming from https://camel.apache.org/manual/camel-4x-upgrade-guide-4_24.html
+#####
+
+#####
+# Update the Camel project from 4.23 to 4.24
+#####
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.CamelMigrationRecipe
+displayName: Migrates `camel 4.23` application to `camel 4.24`
+description: Migrates `camel 4.23` application to `camel 4.24`.
+recipeList:
+  ## inherited from patch recipe
+  - org.apache.camel.upgrade.camel422_3.CamelMigrationRecipe
+  ## defined here
+  - org.apache.camel.upgrade.camel424.migrateUndertowServlet
+  - org.apache.camel.upgrade.camel424.migrateBouncyCastleLms
+  - org.apache.camel.upgrade.camel424.removedComponents
+  - org.apache.camel.upgrade.camel424.migrateRocketMqHeaders
+  - org.apache.camel.upgrade.camel424.migrateSemanticExperts
+  - org.apache.camel.upgrade.camel424.removeBacklogTracerActivity
+  - org.apache.camel.upgrade.camel424.migrateMinioGetObjectRange
+  - org.apache.camel.upgrade.camel424.migrateHuaweiCloudSmnMessageId
+  - org.apache.camel.upgrade.camel424.migrateMcpJsonJackson3
+  - org.apache.camel.upgrade.camel424.migrateMcpJsonJackson3ForOpenAI
+  - org.apache.camel.upgrade.camel424.migrateRouteDiagramRenderer
+  - org.apache.camel.upgrade.camel424.removeToonLengthMarker
+  - org.apache.camel.upgrade.camel424.removeToonLengthMarkerXml
+  - org.apache.camel.upgrade.camel424.removeFtpReadLockOptions
+  - org.apache.camel.upgrade.camel424.removeMinaSftpReadLockOptions
+  - org.apache.camel.upgrade.camel424.removeAzureFilesReadLockOptions
+  - org.apache.camel.upgrade.camel424.removeSmbReadLockOptions
+  - org.apache.camel.upgrade.camel424.migrateKubernetesHttpClientExclusion
+  - org.apache.camel.upgrade.camel424.migratePlc4xS7Light
+  - org.apache.camel.upgrade.camel424.migrateAs2EdiMessageContentType
+  - org.apache.camel.upgrade.camel424.migrateAlibabaSlsListLogStoreName
+  - org.apache.camel.upgrade.camel424.migrateBedrockNonStreamingOperations
+  - org.apache.camel.upgrade.camel424.removeSemanticAuditDecisionCalls
+  - org.apache.camel.upgrade.camel424.migrateJacksonXmlTypeConverterConstant
+  - org.apache.camel.upgrade.camel424.migrateJackson3XmlTypeConverterConstant
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#undertow-servlet-implementation
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateUndertowServlet
+displayName: Migrate io.undertow:undertow-servlet to io.undertow.ee:undertow-servlet
+description: >-
+  CAMEL-27030: camel-undertow uses the Jakarta Servlet 6.1 implementation of Undertow EE. A declared
+  io.undertow:undertow-servlet dependency is changed to io.undertow.ee:undertow-servlet. Exclusions of the old
+  artifact in other dependencies need a manual check.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-undertow
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.undertow
+      oldArtifactId: undertow-servlet
+      newGroupId: io.undertow.ee
+      newArtifactId: undertow-servlet
+      newVersion: 2.0.3.Final
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#bouncy-castle-1-87
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateBouncyCastleLms
+displayName: Migrate the Bouncy Castle LMS and XMSS classes used with camel-pqc
+description: >-
+  CAMEL-27309: Bouncy Castle 1.87 removed org.bouncycastle.pqc.crypto.lms.LMSigParameters and LMOtsParameters
+  (now in org.bouncycastle.crypto.params) and deprecated the LMS and XMSS classes of org.bouncycastle.pqc.jcajce.spec
+  and org.bouncycastle.pqc.jcajce.interfaces in favour of the same classes in org.bouncycastle.jcajce.spec and
+  org.bouncycastle.jcajce.interfaces. LMSParameterSpec and LMSHSSParameterSpec have no new counterpart.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-pqc
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.crypto.lms.LMSigParameters
+      newFullyQualifiedTypeName: org.bouncycastle.crypto.params.LMSigParameters
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.crypto.lms.LMOtsParameters
+      newFullyQualifiedTypeName: org.bouncycastle.crypto.params.LMOtsParameters
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.spec.LMSKeyGenParameterSpec
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.spec.LMSKeyGenParameterSpec
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.spec.LMSHSSKeyGenParameterSpec
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.spec.LMSHSSKeyGenParameterSpec
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.spec.XMSSParameterSpec
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.spec.XMSSParameterSpec
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.spec.XMSSMTParameterSpec
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.spec.XMSSMTParameterSpec
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.LMSKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.LMSKey
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.LMSPrivateKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.LMSPrivateKey
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.XMSSKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.XMSSKey
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.XMSSPrivateKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.XMSSPrivateKey
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.XMSSMTKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.XMSSMTKey
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.bouncycastle.pqc.jcajce.interfaces.XMSSMTPrivateKey
+      newFullyQualifiedTypeName: org.bouncycastle.jcajce.interfaces.XMSSMTPrivateKey
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-ognl-removed
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removedComponents
+displayName: Remove the dependencies of the artifacts removed in Camel 4.24
+description: >-
+  Removes camel-ognl (CAMEL-24786) and camel-jbang-plugin-route-parser (CAMEL-25587). ognl expressions must be
+  rewritten manually (simple, groovy or mvel).
+recipeList:
+  - org.openrewrite.maven.RemoveDependency:
+      groupId: org.apache.camel
+      artifactId: camel-ognl
+  - org.openrewrite.maven.RemoveDependency:
+      groupId: org.apache.camel
+      artifactId: camel-jbang-plugin-route-parser
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-rocketmq-the-headers-are-named-camelrocketmq-and-waitforsendresult-is-true-by-default
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateRocketMqHeaders
+displayName: Migrate the camel-rocketmq header names CamelRockerMQ* to CamelRocketMQ*
+description: >-
+  CAMEL-26155: renames the literal header names and the Endpoint DSL header name builder methods. Usages of the
+  RocketMQConstants fields need no change.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-rocketmq
+recipeList:
+  - org.apache.camel.upgrade.camel418_3.RenameHeaders:
+      headerMappings:
+        CamelRockerMQTopic: CamelRocketMQTopic
+        CamelRockerMQTag: CamelRocketMQTag
+        CamelRockerMQKey: CamelRocketMQKey
+        CamelRockerMQOverrideTopicName: CamelRocketMQOverrideTopicName
+        CamelRockerMQOverrideTag: CamelRocketMQOverrideTag
+        CamelRockerMQOverrideMessageKey: CamelRocketMQOverrideMessageKey
+        CamelRockerMQBrokerName: CamelRocketMQBrokerName
+        CamelRockerMQQueueId: CamelRocketMQQueueId
+        CamelRockerMQStoreSize: CamelRocketMQStoreSize
+        CamelRockerMQQueueOffset: CamelRocketMQQueueOffset
+        CamelRockerMQSysFlag: CamelRocketMQSysFlag
+        CamelRockerMQBornTimestamp: CamelRocketMQBornTimestamp
+        CamelRockerMQBornHost: CamelRocketMQBornHost
+        CamelRockerMQStoreTimestamp: CamelRocketMQStoreTimestamp
+        CamelRockerMQStoreHost: CamelRocketMQStoreHost
+        CamelRockerMQMsgId: CamelRocketMQMsgId
+        CamelRockerMQCommitLogOffset: CamelRocketMQCommitLogOffset
+        CamelRockerMQBodyCrc: CamelRocketMQBodyCrc
+        CamelRockerMQReconsumeTimes: CamelRocketMQReconsumeTimes
+        CamelRockerMQPreparedTransactionOffset: CamelRocketMQPreparedTransactionOffset
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQTopic()
+      newMethodName: rocketMQTopic
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQTag()
+      newMethodName: rocketMQTag
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQKey()
+      newMethodName: rocketMQKey
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQOverrideTopicName()
+      newMethodName: rocketMQOverrideTopicName
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQOverrideTag()
+      newMethodName: rocketMQOverrideTag
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQOverrideMessageKey()
+      newMethodName: rocketMQOverrideMessageKey
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQBrokerName()
+      newMethodName: rocketMQBrokerName
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQQueueId()
+      newMethodName: rocketMQQueueId
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQStoreSize()
+      newMethodName: rocketMQStoreSize
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQQueueOffset()
+      newMethodName: rocketMQQueueOffset
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQSysFlag()
+      newMethodName: rocketMQSysFlag
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQBornTimestamp()
+      newMethodName: rocketMQBornTimestamp
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQBornHost()
+      newMethodName: rocketMQBornHost
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQStoreTimestamp()
+      newMethodName: rocketMQStoreTimestamp
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQStoreHost()
+      newMethodName: rocketMQStoreHost
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQMsgId()
+      newMethodName: rocketMQMsgId
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQCommitLogOffset()
+      newMethodName: rocketMQCommitLogOffset
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQBodyCrc()
+      newMethodName: rocketMQBodyCrc
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQReconsumeTimes()
+      newMethodName: rocketMQReconsumeTimes
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.RocketMQEndpointBuilderFactory.RocketMQHeaderNameBuilder rockerMQPreparedTransactionOffset()
+      newMethodName: rocketMQPreparedTransactionOffset
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-semantic-expert-artifacts
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateSemanticExperts
+displayName: Migrate to the camel-semantic expert artifacts
+description: >-
+  CAMEL-25668: camel-wolf-defender is renamed to camel-semantic-wolf-defender, and TypeSafeAiSemanticAdapter moved
+  to the new camel-semantic-typesafe-ai artifact, which is added when the class is used. Camel JBang --dep options
+  need a manual update.
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.apache.camel
+      oldArtifactId: camel-wolf-defender
+      newGroupId: org.apache.camel
+      newArtifactId: camel-semantic-wolf-defender
+  - org.openrewrite.maven.AddDependency:
+      groupId: org.apache.camel
+      artifactId: camel-semantic-typesafe-ai
+      version: 4.24.0
+      onlyIfUsing: org.apache.camel.component.typesafeai.TypeSafeAiSemanticAdapter
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-core-the-activity-of-the-backlog-tracer-is-replaced-by-the-timeline-dev-console
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeBacklogTracerActivity
+displayName: Remove the backlog tracer activity options
+description: >-
+  CAMEL-26691: the activity tracking of the backlog tracer is removed. Deletes the camel.trace.activityEnabled and
+  camel.trace.activitySize options and the BacklogTracer setActivityEnabled / setActivitySize calls. The other
+  removed getters and dumpActivity methods, the activity dev console and Exchange.ACTIVITY_SPAN_TAGS need a manual
+  migration to the timeline dev console.
+recipeList:
+  - org.openrewrite.properties.DeleteProperty:
+      propertyKey: camel.trace.activityEnabled
+  - org.openrewrite.properties.DeleteProperty:
+      propertyKey: camel.trace.activitySize
+  - org.openrewrite.yaml.DeleteProperty:
+      propertyKey: camel.trace.activityEnabled
+  - org.openrewrite.yaml.DeleteProperty:
+      propertyKey: camel.trace.activitySize
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.spi.BacklogTracer setActivityEnabled(boolean)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.spi.BacklogTracer setActivitySize(int)
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-minio-the-getobjectrange-operation
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateMinioGetObjectRange
+displayName: Migrate the deprecated camel-minio getPartialObject operation to getObjectRange
+description: >-
+  CAMEL-25933: getPartialObject is the deprecated former name of getObjectRange. Renames the operation in endpoint
+  URIs, the MinioOperations enum constant and the camel.component.minio.operation option. String values of the
+  CamelMinioOperation header need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-minio
+recipeList:
+  - org.apache.camel.upgrade.customRecipes.ChangeComponentUriRecipe:
+      uriPattern: "^minio:(.*?(?:[?&]|&amp;))operation=getPartialObject(?=&|$)(.*)$"
+      replacement: "minio:${1}operation=getObjectRange${2}"
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.minio.MinioOperations.getPartialObject
+      fullyQualifiedConstantName: org.apache.camel.component.minio.MinioOperations.getObjectRange
+  - org.openrewrite.properties.ChangePropertyValue:
+      propertyKey: camel.component.minio.operation
+      oldValue: getPartialObject
+      newValue: getObjectRange
+  - org.openrewrite.yaml.ChangePropertyValue:
+      propertyKey: camel.component.minio.operation
+      oldValue: getPartialObject
+      newValue: getObjectRange
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-huaweicloud-smn-a-map-a-list-or-a-pojo-is-published-as-json-and-the-camelhwcloudsmnmessageid-property
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateHuaweiCloudSmnMessageId
+displayName: Migrate the deprecated SmnProperties.SERVICE_MESSAGE_ID to MESSAGE_ID
+description: >-
+  CAMEL-26269: SmnProperties.SERVICE_MESSAGE_ID (CamelHwCloudSmnMesssageId, with a typo) is deprecated in favour of
+  SmnProperties.MESSAGE_ID (CamelHwCloudSmnMessageId). Literal property names need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-huaweicloud-smn
+recipeList:
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.huaweicloud.smn.constants.SmnProperties.SERVICE_MESSAGE_ID
+      fullyQualifiedConstantName: org.apache.camel.component.huaweicloud.smn.constants.SmnProperties.MESSAGE_ID
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#jackson-3-the-mcp-json-module-of-camel-mcp-server-and-camel-openai
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateMcpJsonJackson3
+displayName: Migrate io.modelcontextprotocol.sdk:mcp-json-jackson2 to mcp-json-jackson3
+description: >-
+  CAMEL-26469: camel-mcp-server and the MCP client of camel-openai use the Jackson 3 JSON module of the MCP Java SDK.
+  A declared mcp-json-jackson2 dependency fails with the json-schema-validator 3 that Camel uses, so it is changed
+  to mcp-json-jackson3 (an explicit version is set to 2.2.0, the MCP Java SDK version of Camel 4.24).
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-mcp-server
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.modelcontextprotocol.sdk
+      oldArtifactId: mcp-json-jackson2
+      newGroupId: io.modelcontextprotocol.sdk
+      newArtifactId: mcp-json-jackson3
+      newVersion: 2.2.0
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateMcpJsonJackson3ForOpenAI
+displayName: Migrate io.modelcontextprotocol.sdk:mcp-json-jackson2 to mcp-json-jackson3 with camel-openai
+description: >-
+  CAMEL-26469: camel-mcp-server and the MCP client of camel-openai use the Jackson 3 JSON module of the MCP Java SDK.
+  A declared mcp-json-jackson2 dependency fails with the json-schema-validator 3 that Camel uses, so it is changed
+  to mcp-json-jackson3 (an explicit version is set to 2.2.0, the MCP Java SDK version of Camel 4.24).
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-openai
+recipeList:
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.modelcontextprotocol.sdk
+      oldArtifactId: mcp-json-jackson2
+      newGroupId: io.modelcontextprotocol.sdk
+      newArtifactId: mcp-json-jackson3
+      newVersion: 2.2.0
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-diagram-a-route-diagram-image-draws-the-steps-as-cards
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateRouteDiagramRenderer
+displayName: Migrate the deprecated RouteDiagramRenderer constructor
+description: >-
+  CAMEL-26348: RouteDiagramRenderer(nodeWidth, fontSizeScaled, nodeTextPadding, metrics) is deprecated, as
+  nodeTextPadding is not used. Changes it to RouteDiagramRenderer(nodeWidth, fontSizeScaled, metrics).
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-diagram
+recipeList:
+  - org.openrewrite.java.DeleteMethodArgument:
+      methodPattern: org.apache.camel.diagram.RouteDiagramRenderer <constructor>(int, int, int, boolean)
+      argumentIndex: 2
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-toon-the-lengthmarker-option-is-removed-breaking-change
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeToonLengthMarker
+displayName: Remove the camel-toon lengthMarker option
+description: >-
+  CAMEL-25689: the lengthMarker option of the TOON data format is removed. Removes it from the Java DSL, the YAML DSL
+  and the camel.dataformat.toon.length-marker option. TOON data with a [#N] array header needs a manual fix.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-toon
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.model.dataformat.ToonDataFormat.Builder lengthMarker(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.model.dataformat.ToonDataFormat setLengthMarker(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.dataformat.toon.ToonDataFormat setLengthMarker(..)
+  - org.openrewrite.yaml.DeleteKey:
+      keyPath: $..toon.lengthMarker
+  - org.openrewrite.properties.DeleteProperty:
+      propertyKey: camel.dataformat.toon.length-marker
+  - org.openrewrite.yaml.DeleteProperty:
+      propertyKey: camel.dataformat.toon.length-marker
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeToonLengthMarkerXml
+displayName: Remove the camel-toon lengthMarker option from the XML DSL
+description: "CAMEL-25689: removes the lengthMarker attribute of the toon data format in the Camel XML DSL."
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-toon
+  - org.apache.camel.upgrade.customRecipes.FindCamelXmlDsl
+recipeList:
+  - org.openrewrite.xml.ChangeTagAttribute:
+      elementName: //toon
+      attributeName: lengthMarker
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-ftp-camel-mina-sftp-camel-azure-files-camel-smb-a-readlock-the-component-does-not-implement-fails-the-consumer
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeFtpReadLockOptions
+displayName: Remove the removed readLock Endpoint DSL methods of ftp, ftps and sftp
+description: >-
+  CAMEL-26337: the readLock options that only the file component implements did nothing on ftp, ftps and sftp, and their
+  Endpoint DSL builder methods are removed. Removes the calls. The options in endpoint URIs still work and are left
+  alone; an unsupported readLock value needs a manual fix.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-ftp
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FtpEndpointBuilderFactory.FtpEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FtpEndpointBuilderFactory.FtpEndpointConsumerBuilder readLockRemoveOn*(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FtpsEndpointBuilderFactory.FtpsEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FtpsEndpointBuilderFactory.FtpsEndpointConsumerBuilder readLockRemoveOn*(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.SftpEndpointBuilderFactory.SftpEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.SftpEndpointBuilderFactory.SftpEndpointConsumerBuilder readLockRemoveOn*(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.SftpEndpointBuilderFactory.SftpEndpointConsumerBuilder readLockIdempotentRelease*(..)
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeMinaSftpReadLockOptions
+displayName: Remove the removed readLock Endpoint DSL methods of mina-sftp
+description: >-
+  CAMEL-26337: the readLock options that only the file component implements did nothing on mina-sftp, and their
+  Endpoint DSL builder methods are removed. Removes the calls. The options in endpoint URIs still work and are left
+  alone; an unsupported readLock value needs a manual fix.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-mina-sftp
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.MinaSftpEndpointBuilderFactory.MinaSftpEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.MinaSftpEndpointBuilderFactory.MinaSftpEndpointConsumerBuilder readLockRemoveOn*(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.MinaSftpEndpointBuilderFactory.MinaSftpEndpointConsumerBuilder readLockIdempotentRelease*(..)
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeAzureFilesReadLockOptions
+displayName: Remove the removed readLock Endpoint DSL methods of azure-files
+description: >-
+  CAMEL-26337: the readLock options that only the file component implements did nothing on azure-files, and their
+  Endpoint DSL builder methods are removed. Removes the calls. The options in endpoint URIs still work and are left
+  alone; an unsupported readLock value needs a manual fix.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-azure-files
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.FilesEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.FilesEndpointConsumerBuilder readLockRemoveOn*(..)
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeSmbReadLockOptions
+displayName: Remove the removed readLock Endpoint DSL methods of smb
+description: >-
+  CAMEL-26337: the readLock options that only the file component implements did nothing on smb, and their
+  Endpoint DSL builder methods are removed. Removes the calls. The options in endpoint URIs still work and are left
+  alone; an unsupported readLock value needs a manual fix.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-smb
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.SmbEndpointConsumerBuilder readLockDeleteOrphanLockFiles(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.SmbEndpointConsumerBuilder readLockRemoveOn*(..)
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-kubernetes-kubernetes-client-8
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateKubernetesHttpClientExclusion
+displayName: Migrate the exclusion of the fabric8 Vert.x HTTP client to kubernetes-httpclient-vertx-5
+description: >-
+  CAMEL-25031: the fabric8 Kubernetes client 8 uses kubernetes-httpclient-vertx-5. An exclusion of
+  kubernetes-httpclient-vertx is renamed. The Jackson 3 changes need a manual migration.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-kubernetes
+recipeList:
+  - org.openrewrite.xml.ChangeTagValue:
+      elementName: //exclusions/exclusion/artifactId
+      oldValue: kubernetes-httpclient-vertx
+      newValue: kubernetes-httpclient-vertx-5
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-plc4x-plc4x-1-0-0-and-the-triggered-consumer
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migratePlc4xS7Light
+displayName: Migrate plc4x:s7-light endpoints to plc4x:s7
+description: >-
+  CAMEL-25617: the S7 driver of PLC4X 1.0.0 no longer includes the s7-light driver. Renames the scheme; the renamed
+  driver parameters and the tag address syntax need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-plc4x
+recipeList:
+  - org.apache.camel.upgrade.customRecipes.ChangeComponentUriRecipe:
+      uriPattern: "^plc4x:s7-light://(.*)$"
+      replacement: "plc4x:s7://${1}"
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-alibaba-sls-the-header-of-listlogstores-is-named-camelalibabaslslistlogstorename
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateAlibabaSlsListLogStoreName
+displayName: Migrate the camel-alibaba-sls Endpoint DSL alibabaSlsLogstoreName() to alibabaSlsListLogStoreName()
+description: >-
+  CAMEL-27138: the header of listLogStores is now CamelAlibabaSlsListLogStoreName. Renames the Endpoint DSL header
+  name builder method. The literal CamelAlibabaSlsLogstoreName differs from CamelAlibabaSlsLogStoreName only in case,
+  so literal names need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-alibaba-sls
+recipeList:
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: org.apache.camel.builder.endpoint.dsl.AlibabaSlsEndpointBuilderFactory.AlibabaSlsHeaderNameBuilder alibabaSlsLogstoreName()
+      newMethodName: alibabaSlsListLogStoreName
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-aws-bedrock-invokeimagemodelstreaming-and-invokeembeddingsmodelstreaming-are-deprecated
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateBedrockNonStreamingOperations
+displayName: Migrate the deprecated camel-aws-bedrock invokeImageModelStreaming and invokeEmbeddingsModelStreaming operations
+description: >-
+  The image and embedding models do not stream their response, so invokeImageModelStreaming and
+  invokeEmbeddingsModelStreaming are deprecated in favour of invokeImageModel and invokeEmbeddingsModel. Renames the
+  operation in endpoint URIs, the BedrockOperations enum constants and the camel.component.aws-bedrock.operation
+  option. String values of the CamelAwsBedrockOperation header need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-aws-bedrock
+recipeList:
+  - org.apache.camel.upgrade.customRecipes.ChangeComponentUriRecipe:
+      uriPattern: "^aws-bedrock:(.*?(?:[?&]|&amp;))operation=invokeImageModelStreaming(?=&|$)(.*)$"
+      replacement: "aws-bedrock:${1}operation=invokeImageModel${2}"
+  - org.apache.camel.upgrade.customRecipes.ChangeComponentUriRecipe:
+      uriPattern: "^aws-bedrock:(.*?(?:[?&]|&amp;))operation=invokeEmbeddingsModelStreaming(?=&|$)(.*)$"
+      replacement: "aws-bedrock:${1}operation=invokeEmbeddingsModel${2}"
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.aws2.bedrock.runtime.BedrockOperations.invokeImageModelStreaming
+      fullyQualifiedConstantName: org.apache.camel.component.aws2.bedrock.runtime.BedrockOperations.invokeImageModel
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.aws2.bedrock.runtime.BedrockOperations.invokeEmbeddingsModelStreaming
+      fullyQualifiedConstantName: org.apache.camel.component.aws2.bedrock.runtime.BedrockOperations.invokeEmbeddingsModel
+  - org.openrewrite.properties.ChangePropertyValue:
+      propertyKey: camel.component.aws-bedrock.operation
+      oldValue: invokeImageModelStreaming
+      newValue: invokeImageModel
+  - org.openrewrite.properties.ChangePropertyValue:
+      propertyKey: camel.component.aws-bedrock.operation
+      oldValue: invokeEmbeddingsModelStreaming
+      newValue: invokeEmbeddingsModel
+  - org.openrewrite.yaml.ChangePropertyValue:
+      propertyKey: camel.component.aws-bedrock.operation
+      oldValue: invokeImageModelStreaming
+      newValue: invokeImageModel
+  - org.openrewrite.yaml.ChangePropertyValue:
+      propertyKey: camel.component.aws-bedrock.operation
+      oldValue: invokeEmbeddingsModelStreaming
+      newValue: invokeEmbeddingsModel
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-semantic-evaluation-only-auditing
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.removeSemanticAuditDecisionCalls
+displayName: Remove the removed camel-semantic audit decision calls
+description: >-
+  CAMEL-25618: SemanticAudit (with get(context).decision(...)) and SemanticObserver.decision(...) are removed;
+  evaluation auditing is automatic. Removes the calls. SemanticAuditDecision beans, overrides of SemanticObserver.decision and
+  readers of the audit records need a manual update.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-semantic
+recipeList:
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.semantic.SemanticAudit decision(..)
+  # the class is removed: drop the SemanticAudit.get(context) statement left behind by the call removal
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.semantic.SemanticAudit get(..)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: org.apache.camel.semantic.SemanticObserver decision(..)
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateJacksonXmlTypeConverterConstant
+displayName: Migrate the deprecated camel-jacksonxml JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER
+description: >-
+  JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER is deprecated in Camel 4.24 as a duplicate of ENABLE_TYPE_CONVERTER,
+  which holds the same value. Not listed in the upgrade guide.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-jacksonxml
+recipeList:
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.jacksonxml.JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER
+      fullyQualifiedConstantName: org.apache.camel.component.jacksonxml.JacksonXMLConstants.ENABLE_TYPE_CONVERTER
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateJackson3XmlTypeConverterConstant
+displayName: Migrate the deprecated camel-jackson3xml JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER
+description: >-
+  JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER is deprecated in Camel 4.24 as a duplicate of ENABLE_TYPE_CONVERTER,
+  which holds the same value. Not listed in the upgrade guide.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-jackson3xml
+recipeList:
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: org.apache.camel.component.jackson3xml.JacksonXMLConstants.ENABLE_XML_TYPE_CONVERTER
+      fullyQualifiedConstantName: org.apache.camel.component.jackson3xml.JacksonXMLConstants.ENABLE_TYPE_CONVERTER
+---
+## https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_24.adoc#camel-as2-clientsend
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel424.migrateAs2EdiMessageContentType
+displayName: Migrate the deprecated camel-as2 ediMessageType option of client/send to ediMessageContentType
+description: >-
+  CAMEL-25924: the ediMessageType option is deprecated; client/send takes the content type from
+  ediMessageContentType. Renames the option in as2:client/send endpoint URIs that do not set ediMessageContentType
+  already. Other API names and the Endpoint DSL need a manual check.
+preconditions:
+  - org.openrewrite.java.dependencies.search.ModuleHasDependency:
+      groupIdPattern: org.apache.camel
+      artifactIdPattern: camel-as2
+recipeList:
+  - org.apache.camel.upgrade.customRecipes.ChangeComponentUriRecipe:
+      uriPattern: "^as2:(//)?client/send(?!.*(?:[?&]|&amp;)ediMessageContentType=)(.*?(?:[?&]|&amp;))ediMessageType=(.*)$"
+      replacement: "as2:${1}client/send${2}ediMessageContentType=${3}"
