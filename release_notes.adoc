@@ -55,7 +55,7 @@ The 10 most important items of the guide.
 | Manual.
 |===
 
-Also automated (see `4.24.yaml`): Undertow EE servlet, Bouncy Castle 1.87 LMS/XMSS classes, rocketmq headers, toon `lengthMarker`, semantic expert artifacts and audit `decision` calls, backlog tracer activity options, Kubernetes client exclusion, minio `getObjectRange`, as2 client/send `ediMessageContentType`, aws-bedrock non-streaming operations, huaweicloud-smn `MESSAGE_ID`, jacksonxml / jackson3xml `ENABLE_TYPE_CONVERTER`, `RouteDiagramRenderer` constructor, `plc4x:s7-light` -> `plc4x:s7`, alibaba-sls `alibabaSlsListLogStoreName()`, removed `camel-jbang-plugin-route-parser`, and the 4.22.3 openstack Swift headers. Everything else in the guide is manual.
+Also automated (see `4.24.yaml`): Undertow EE servlet, Bouncy Castle 1.87 LMS/XMSS classes, rocketmq headers, toon `lengthMarker`, semantic expert artifacts and audit `decision` calls, backlog tracer activity options, Kubernetes client exclusion, minio `getObjectRange`, as2 client/send `ediMessageContentType`, aws-bedrock non-streaming operations, huaweicloud-smn `MESSAGE_ID`, jacksonxml / jackson3xml `ENABLE_TYPE_CONVERTER`, `RouteDiagramRenderer` constructor, `plc4x:s7-light` -> `plc4x:s7`, alibaba-sls `alibabaSlsListLogStoreName()`, removed `camel-jbang-plugin-route-parser`, and the 4.22.3 openstack Swift headers and pubnub override channel. Everything else in the guide is manual.
 
 NOTE: Camel 4.24.0 is not released yet. The recipes were developed against 4.23.0. The tests that need 4.24.0 artifacts (the semantic artifacts and the latest version bumps) were not run.
 
@@ -212,8 +212,8 @@ Patch recipes for Camel 4.22.3 (`camel422_3.CamelMigrationRecipe`), chained by t
 | Inherited from the 4.18.6 patch recipe `camel418_6.upgradeOpenstackSwiftHeaders`; see <<4.18.6>>.
 
 | https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#camel-pubnub---the-producer-uses-its-configured-channel[camel-pubnub: `CamelPubNubOverrideChannel`]
-| ❌ None
-| `CamelPubNubChannel` must be renamed only where it is set for a producer; not covered yet.
+| ⚠️ Partial
+| `camel422_3.upgradePubNubOverrideChannel`: `CamelPubNubChannel` -> `CamelPubNubOverrideChannel` only where a route sets it (`setHeader` in Java, XML and YAML, `Message.setHeader`, `PubNubConstants.CHANNEL`, Endpoint DSL `pubNubChannel()`), with the new generic `camel422_3.RenameHeaderWhenSet`; reads of the consumer header stay. Gated on `camel-pubnub`. A statically imported `CHANNEL` needs a manual fix.
 
 | https://github.com/apache/camel/blob/main/docs/user-manual/modules/ROOT/pages/camel-4x-upgrade-guide-4_22.adoc#upgrading-from-4222-to-4223[Other 4.22.3 changes]
 | ❌ None

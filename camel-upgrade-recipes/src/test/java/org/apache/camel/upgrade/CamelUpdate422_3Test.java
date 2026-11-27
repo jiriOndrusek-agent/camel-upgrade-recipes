@@ -24,17 +24,19 @@ import org.openrewrite.test.TypeValidation;
 
 import static org.openrewrite.java.Assertions.java;
 import static org.openrewrite.java.Assertions.mavenProject;
+import static org.openrewrite.xml.Assertions.xml;
+import static org.openrewrite.yaml.Assertions.yaml;
 
 /**
- * Tests for migrating from Camel 4.22.2 to 4.22.3. The openstack Swift header rename (CAMEL-25895) is the 4.18.6
- * recipe, covered by {@link CamelUpdate418_6Test}; this class guards that the 4.22.3 chain references it.
+ * Tests for migrating from Camel 4.22.2 to 4.22.3: the pubnub override channel header (CAMEL-25888), and the chain
+ * reference to the 4.18.6 openstack Swift header rename (CAMEL-25895), which {@link CamelUpdate418_6Test} covers.
  */
 public class CamelUpdate422_3Test implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
         CamelTestUtil.recipe(spec, CamelTestUtil.CamelVersion.v4_22_3, true)
-                .parser(CamelTestUtil.parserFromClasspath(CamelTestUtil.CamelVersion.v4_22, "camel-api", "camel-core-model", "camel-support", "camel-endpointdsl"))
+                .parser(CamelTestUtil.parserFromClasspath(CamelTestUtil.CamelVersion.v4_22, "camel-api", "camel-core-model", "camel-support", "camel-endpointdsl", "camel-pubnub"))
                 .typeValidationOptions(TypeValidation.none());
     }
 
@@ -63,6 +65,191 @@ public class CamelUpdate422_3Test implements RewriteTest {
                                     @Override
                                     public void configure() {
                                         from("direct:container").setHeader("CamelOpenstackSwiftContainerRead", constant(".r:*")).to("openstack-swift:localhost");
+                                    }
+                                }
+                                """
+                        )
+                )
+        );
+    }
+
+    @Test
+    void pubNubOverrideChannelJava() {
+        rewriteRun(
+                mavenProject("test-pubnub",
+                        CamelTestUtil.pomXmlSpec("camel-pubnub", CamelTestUtil.CamelVersion.v4_22_2),
+                        //language=java
+                        java(
+                                """
+                                import org.apache.camel.builder.RouteBuilder;
+                                import org.apache.camel.component.pubnub.PubNubConstants;
+
+                                public class PubNubRoute extends RouteBuilder {
+                                    @Override
+                                    public void configure() {
+                                        from("pubnub:in")
+                                            .log("received on ${header.CamelPubNubChannel}")
+                                            .filter(header("CamelPubNubChannel").isEqualTo("in"))
+                                            .setHeader("CamelPubNubChannel", constant("out"))
+                                            .setHeader(PubNubConstants.CHANNEL, constant("out"))
+                                            .process(exchange -> {
+                                                String from = exchange.getIn().getHeader("CamelPubNubChannel", String.class);
+                                                exchange.getIn().setHeader("CamelPubNubChannel", from + "-copy");
+                                            })
+                                            .to("pubnub:out");
+                                    }
+                                }
+                                """,
+                                """
+                                import org.apache.camel.builder.RouteBuilder;
+                                import org.apache.camel.component.pubnub.PubNubConstants;
+
+                                public class PubNubRoute extends RouteBuilder {
+                                    @Override
+                                    public void configure() {
+                                        from("pubnub:in")
+                                            .log("received on ${header.CamelPubNubChannel}")
+                                            .filter(header("CamelPubNubChannel").isEqualTo("in"))
+                                            .setHeader("CamelPubNubOverrideChannel", constant("out"))
+                                            .setHeader(PubNubConstants.OVERRIDE_CHANNEL, constant("out"))
+                                            .process(exchange -> {
+                                                String from = exchange.getIn().getHeader("CamelPubNubChannel", String.class);
+                                                exchange.getIn().setHeader("CamelPubNubOverrideChannel", from + "-copy");
+                                            })
+                                            .to("pubnub:out");
+                                    }
+                                }
+                                """
+                        ),
+                        //language=java
+                        java(
+                                """
+                                import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
+
+                                public class PubNubDslRoute extends EndpointRouteBuilder {
+                                    @Override
+                                    public void configure() {
+                                        from(pubnub("in"))
+                                            .setHeader(pubnub().pubNubChannel(), constant("out"))
+                                            .to(pubnub("out"));
+                                    }
+                                }
+                                """,
+                                """
+                                import org.apache.camel.builder.endpoint.EndpointRouteBuilder;
+
+                                public class PubNubDslRoute extends EndpointRouteBuilder {
+                                    @Override
+                                    public void configure() {
+                                        from(pubnub("in"))
+                                            .setHeader(pubnub().pubNubOverrideChannel(), constant("out"))
+                                            .to(pubnub("out"));
+                                    }
+                                }
+                                """
+                        )
+                )
+        );
+    }
+
+    @Test
+    void pubNubOverrideChannelXmlAndYaml() {
+        rewriteRun(
+                mavenProject("test-pubnub-dsl",
+                        CamelTestUtil.pomXmlSpec("camel-pubnub", CamelTestUtil.CamelVersion.v4_22_2),
+                        //language=xml
+                        xml(
+                                """
+                                <route xmlns="http://camel.apache.org/schema/spring">
+                                    <from uri="pubnub:in"/>
+                                    <log message="received on ${header.CamelPubNubChannel}"/>
+                                    <setHeader name="CamelPubNubChannel">
+                                        <constant>out</constant>
+                                    </setHeader>
+                                    <to uri="pubnub:out"/>
+                                </route>
+                                """,
+                                """
+                                <route xmlns="http://camel.apache.org/schema/spring">
+                                    <from uri="pubnub:in"/>
+                                    <log message="received on ${header.CamelPubNubChannel}"/>
+                                    <setHeader name="CamelPubNubOverrideChannel">
+                                        <constant>out</constant>
+                                    </setHeader>
+                                    <to uri="pubnub:out"/>
+                                </route>
+                                """
+                        ),
+                        //language=yaml
+                        yaml(
+                                """
+                                - route:
+                                    from:
+                                      uri: "pubnub:in"
+                                      steps:
+                                        - removeHeader:
+                                            name: CamelPubNubChannel
+                                        - setHeader:
+                                            name: CamelPubNubChannel
+                                            simple: "${header.CamelPubNubChannel}-copy"
+                                        - to:
+                                            uri: "pubnub:out"
+                                """,
+                                """
+                                - route:
+                                    from:
+                                      uri: "pubnub:in"
+                                      steps:
+                                        - removeHeader:
+                                            name: CamelPubNubChannel
+                                        - setHeader:
+                                            name: CamelPubNubOverrideChannel
+                                            simple: "${header.CamelPubNubChannel}-copy"
+                                        - to:
+                                            uri: "pubnub:out"
+                                """
+                        )
+                )
+        );
+    }
+
+    @Test
+    void pubNubOverrideChannelIsIdempotent() {
+        rewriteRun(
+                spec -> spec.expectedCyclesThatMakeChanges(CamelTestUtil.isRecipeOverridden() ? 1 : 0),
+                mavenProject("test-pubnub-idempotent",
+                        CamelTestUtil.pomXmlSpec("camel-pubnub", CamelTestUtil.CamelVersion.v4_22_2),
+                        //language=xml
+                        xml(
+                                """
+                                <route xmlns="http://camel.apache.org/schema/spring">
+                                    <from uri="direct:in"/>
+                                    <setHeader name="CamelPubNubOverrideChannel">
+                                        <constant>out</constant>
+                                    </setHeader>
+                                    <to uri="pubnub:out"/>
+                                </route>
+                                """
+                        )
+                )
+        );
+    }
+
+    @Test
+    void pubNubWithoutDependencyIsUntouched() {
+        rewriteRun(
+                spec -> spec.expectedCyclesThatMakeChanges(CamelTestUtil.isRecipeOverridden() ? 1 : 0),
+                mavenProject("test-no-pubnub",
+                        CamelTestUtil.pomXmlSpec("camel-core", CamelTestUtil.CamelVersion.v4_22_2),
+                        //language=java
+                        java(
+                                """
+                                import org.apache.camel.builder.RouteBuilder;
+
+                                public class OtherRoute extends RouteBuilder {
+                                    @Override
+                                    public void configure() {
+                                        from("direct:in").setHeader("CamelPubNubChannel", constant("out")).to("mock:out");
                                     }
                                 }
                                 """
