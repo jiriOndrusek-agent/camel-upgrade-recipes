@@ -46,7 +46,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -63,7 +63,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -91,7 +91,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -113,7 +113,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -144,7 +144,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -171,7 +171,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -206,7 +206,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -240,7 +240,7 @@ class CamelSpringBoot422Test implements RewriteTest {
                             <version>1.0.0</version>
                             <properties>
                                 <camel.version>4.18.0</camel.version>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>

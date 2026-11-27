@@ -66,7 +66,7 @@ recipeList:
   - org.openrewrite.maven.ChangePropertyValue:
       key: camel.springboot.version
       newValue: @camel-spring-boot-version@
-  - org.apache.camel.upgrade.camel423.CamelSpringBootMigrationRecipe
+  - org.apache.camel.upgrade.camel424.CamelSpringBootMigrationRecipe
   - org.openrewrite.maven.UpgradeDependencyVersion:
       groupId: org.springframework.boot
       artifactId: "*"
@@ -87,3 +87,6 @@ recipeList:
       groupId: org.springframework.boot
       artifactId: spring-boot-starter-parent
       newVersion: @spring-boot-version@
+  # Camel 4.24 requires Java 21, after the Java 17 step of the Spring Boot 3 to 4 migration
+  - org.apache.camel.upgrade.UpgradeToJava21
+  - org.apache.camel.upgrade.JavaVersion21

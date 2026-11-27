@@ -52,7 +52,7 @@ public abstract class AbstractCamelUpdateVersionTest implements RewriteTest {
 
                <properties>
                   <camel.version>%s</camel.version>
-                  <maven.compiler.release>17</maven.compiler.release>
+                  <maven.compiler.release>%s</maven.compiler.release>
                </properties>
       
                <dependencies>
@@ -63,7 +63,7 @@ public abstract class AbstractCamelUpdateVersionTest implements RewriteTest {
                    </dependency>
                  </dependencies>
             </project>
-            """.formatted(targetVersion());
+            """.formatted(targetVersion(), javaVersion());
         //language=xml
         rewriteRun(pomXml(
           """
@@ -88,5 +88,12 @@ public abstract class AbstractCamelUpdateVersionTest implements RewriteTest {
             </project>
             """,
                 result));
+    }
+
+    /**
+     * Java release the aggregate sets: 17 for the LTS aggregates, 21 for latest (Camel 4.24+).
+     */
+    protected String javaVersion() {
+        return "17";
     }
 }

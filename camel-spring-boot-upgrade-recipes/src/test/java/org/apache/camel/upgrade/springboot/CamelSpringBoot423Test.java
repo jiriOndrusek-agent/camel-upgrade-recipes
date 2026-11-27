@@ -53,7 +53,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -70,7 +70,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                         </project>
                         """
@@ -90,7 +90,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -107,7 +107,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -139,7 +139,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -166,7 +166,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -198,7 +198,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -215,7 +215,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -255,7 +255,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -307,7 +307,7 @@ class CamelSpringBoot423Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
