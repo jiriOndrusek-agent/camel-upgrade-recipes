@@ -80,7 +80,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -102,7 +102,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -135,7 +135,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -191,7 +191,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -208,7 +208,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                         </project>
                         """
@@ -228,7 +228,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -245,7 +245,7 @@ public class CamelUpdate422Test implements RewriteTest {
                             <artifactId>test</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <maven.compiler.release>17</maven.compiler.release>
+                                <maven.compiler.release>21</maven.compiler.release>
                             </properties>
                             <dependencies>
                                 <dependency>
@@ -273,7 +273,7 @@ public class CamelUpdate422Test implements RewriteTest {
                                     <artifactId>test</artifactId>
                                     <version>1.0.0</version>
                                     <properties>
-                                        <maven.compiler.release>17</maven.compiler.release>
+                                        <maven.compiler.release>21</maven.compiler.release>
                                     </properties>
                                     <dependencies>
                                         <dependency>
@@ -290,7 +290,7 @@ public class CamelUpdate422Test implements RewriteTest {
                                     <artifactId>test</artifactId>
                                     <version>1.0.0</version>
                                     <properties>
-                                        <maven.compiler.release>17</maven.compiler.release>
+                                        <maven.compiler.release>21</maven.compiler.release>
                                     </properties>
                                     <dependencies>
                                         <dependency>
@@ -353,7 +353,7 @@ public class CamelUpdate422Test implements RewriteTest {
                                     <artifactId>test</artifactId>
                                     <version>1.0.0</version>
                                     <properties>
-                                        <maven.compiler.release>17</maven.compiler.release>
+                                        <maven.compiler.release>21</maven.compiler.release>
                                     </properties>
                                     <dependencies>
                                         <dependency>
@@ -370,7 +370,7 @@ public class CamelUpdate422Test implements RewriteTest {
                                     <artifactId>test</artifactId>
                                     <version>1.0.0</version>
                                     <properties>
-                                        <maven.compiler.release>17</maven.compiler.release>
+                                        <maven.compiler.release>21</maven.compiler.release>
                                     </properties>
                                     <dependencies>
                                         <dependency>

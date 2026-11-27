@@ -50,3 +50,36 @@ recipeList:
       version: 17
   - org.openrewrite.maven.UseMavenCompilerPluginReleaseConfiguration:
       releaseVersion: 17
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.UpgradeToJava21
+displayName: Migrate to Java 21
+description: >
+  Camel 4.24 requires Java 21. Applies the changes of UpgradeToJava17 with 21 as the minimum version.
+  Used only by the latest aggregates; the LTS aggregates keep their Java baseline.
+tags:
+  - java21
+recipeList:
+  - org.apache.camel.upgrade.SetupJavaUpgradeJavaVersion:
+      minimumJavaMajorVersion: 21
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: java.lang.Runtime traceInstructions(boolean)
+  - org.openrewrite.java.RemoveMethodInvocations:
+      methodPattern: java.lang.System traceMethodCalls(boolean)
+  - org.openrewrite.maven.UpgradePluginVersion:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-checkstyle-plugin
+      newVersion: 3.x
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.JavaVersion21
+displayName: Change Maven Java version property values to 21
+description: Change maven.compiler.source and maven.compiler.target values to 21.
+tags:
+  - java21
+  - compiler
+recipeList:
+  - org.apache.camel.upgrade.UpgradeJavaVersion:
+      version: 21
+  - org.openrewrite.maven.UseMavenCompilerPluginReleaseConfiguration:
+      releaseVersion: 21
