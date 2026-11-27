@@ -20,6 +20,7 @@ name: org.apache.camel.upgrade.Camel422LTSMigrationRecipe
 displayName: Migrate to Camel 4.22LTS
 description: Migrates Apache Camel application to 4.22 LTS. This recipe aggregates all migration steps from 4.0 to @camel4.22-lts-version@.
 recipeList:
+  - org.apache.camel.upgrade.camel422_3.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422_2.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422_1.CamelMigrationRecipe
   - org.apache.camel.upgrade.camel422.CamelMigrationRecipe

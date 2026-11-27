@@ -16,6 +16,7 @@
  */
 package org.apache.camel.upgrade.springboot;
 
+import org.apache.camel.upgrade.CamelTestUtil;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
@@ -37,7 +38,8 @@ import static org.openrewrite.maven.Assertions.pomXml;
  */
 class CamelSpringBoot422LtsVersionTest implements RewriteTest {
 
-    private static final String LTS_VERSION = "4.22.2";
+    /** The {@code camel4.22-lts-version} property of the parent pom, filtered into versions.properties. */
+    private static final String LTS_VERSION = CamelTestUtil.getCamel422LtsVersion();
 
     /**
      * Spring Boot line of camel-spring-boot 4.22.x. The aggregate shares its Spring targets with

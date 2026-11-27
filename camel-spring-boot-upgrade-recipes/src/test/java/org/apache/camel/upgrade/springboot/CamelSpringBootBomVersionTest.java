@@ -102,7 +102,7 @@ class CamelSpringBootBomVersionTest implements RewriteTest {
                             <artifactId>my-app</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <camel-spring-boot-version>4.18.5</camel-spring-boot-version>
+                                <camel-spring-boot-version>4.18.6</camel-spring-boot-version>
                             </properties>
                             <dependencyManagement>
                                 <dependencies>
@@ -156,7 +156,7 @@ class CamelSpringBootBomVersionTest implements RewriteTest {
                             <artifactId>my-app</artifactId>
                             <version>1.0.0</version>
                             <properties>
-                                <camel.springboot.version>4.18.5</camel.springboot.version>
+                                <camel.springboot.version>4.18.6</camel.springboot.version>
                             </properties>
                             <dependencyManagement>
                                 <dependencies>
@@ -211,7 +211,7 @@ class CamelSpringBootBomVersionTest implements RewriteTest {
                                     <dependency>
                                         <groupId>org.apache.camel.springboot</groupId>
                                         <artifactId>camel-spring-boot-dependencies</artifactId>
-                                        <version>4.18.5</version>
+                                        <version>4.18.6</version>
                                         <type>pom</type>
                                         <scope>import</scope>
                                     </dependency>
