@@ -1,0 +1,37 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#####
+# Rules coming from https://camel.apache.org/manual/camel-4x-upgrade-guide-4_22.html
+# Specifically changes introduced in 4.22.3 (upgrading from 4.22.2 to 4.22.3),
+# checked against the camel-4.22.3 tag (the guide on main lists more items than the tag ships).
+#
+# Referenced from org.apache.camel.upgrade.Camel422LTSMigrationRecipe and from camel424.CamelMigrationRecipe
+# (Camel 4.23.0 does not have these changes), per RECIPE-CONVENTIONS.md.
+#####
+
+#####
+# Update the Camel project from 4.22.2 to 4.22.3
+#####
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.apache.camel.upgrade.camel422_3.CamelMigrationRecipe
+displayName: Migrates `camel 4.22.2` application to `camel 4.22.3`
+description: Migrates `camel 4.22.2` application to `camel 4.22.3`.
+recipeList:
+  ## inherited from patch recipe: the openstack Swift header rename also ships in 4.18.6
+  - org.apache.camel.upgrade.camel418_6.upgradeOpenstackSwiftHeaders
